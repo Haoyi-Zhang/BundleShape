@@ -6,7 +6,7 @@ import argparse
 import json
 from pathlib import Path
 
-from src.producer_core import AdmissionError, canonical_digest, parse_bundle
+from src.producer_core import AdmissionError, EnvironmentFailure, canonical_digest, parse_bundle
 
 
 def main() -> int:
@@ -18,6 +18,9 @@ def main() -> int:
         parsed = parse_bundle(args.bundle)
         obj = {"digest": canonical_digest(parsed), "canonical": parsed.canonical_obj}
         code = 0
+    except (EnvironmentFailure, OSError) as exc:
+        obj = {"admitted": None, "status": "environment-error", "reason": str(exc)}
+        code = 3
     except AdmissionError as exc:
         obj = {"admitted": False, "error": exc.as_dict()}
         code = 2

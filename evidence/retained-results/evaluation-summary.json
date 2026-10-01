@@ -1,32 +1,27 @@
 {
   "campaign": {
     "child_processes": 0,
-    "cpu_seconds": 15.430021,
-    "wall_seconds": 15.434057,
+    "cpu_seconds": 22.759935,
+    "wall_seconds": 22.785179,
     "workers": 1
   },
   "certificate_mutations": {
-    "base_certificates": 72,
     "by_decision": {
       "different": {
         "accepted": 0,
-        "attempts": 120,
-        "base_certificates": 24
+        "attempts": 120
       },
       "equivalent": {
         "accepted": 0,
-        "attempts": 120,
-        "base_certificates": 24
+        "attempts": 120
       },
       "out-of-language": {
         "accepted": 0,
-        "attempts": 120,
-        "base_certificates": 24
+        "attempts": 120
       }
     },
     "incorrectly_accepted": 0,
     "mutations": 360,
-    "mutations_per_base_certificate": 5,
     "rejected": 360,
     "unexpected_accept_examples": []
   },
@@ -34,8 +29,8 @@
     "all_expected_and_checked": true,
     "certificate_bytes": {
       "max": 612,
-      "median": 434.0,
-      "min": 145
+      "median": 531.5,
+      "min": 146
     },
     "checker_accepted": 512,
     "expected_counts": {
@@ -56,14 +51,14 @@
       "swap_siblings": 37
     },
     "pairs": 512,
-    "producer_checker_canonical_or_rejection_agreements": 512,
+    "producer_checker_parser_agreements": 512,
     "producer_counts": {
       "different": 160,
       "equivalent": 256,
       "out-of-language": 96
     },
     "seed": 20260917,
-    "wall_seconds": 6.137073
+    "wall_seconds": 9.60791
   },
   "coupling_control": {
     "byte_inventory_equal": false,
@@ -84,32 +79,30 @@
     "checker_accepted": true,
     "child_processes": 0,
     "classes": 1201,
-    "content_pages": 16,
     "css_declarations": 3601,
     "css_rules": 1200,
     "decision": "equivalent",
     "five_run_cpu_seconds": [
-      0.303912,
-      0.353787,
-      0.339463,
-      0.302805,
-      0.3358
+      0.467711,
+      0.514045,
+      0.504609,
+      0.489279,
+      0.498738
     ],
     "five_run_wall_seconds": [
-      0.303996,
-      0.353816,
-      0.339475,
-      0.302816,
-      0.335828
+      0.468056,
+      0.514058,
+      0.504879,
+      0.489293,
+      0.499007
     ],
-    "html_resources": 17,
     "ids": 1200,
     "input_bytes_both_endpoints": 322897,
-    "median_cpu_seconds": 0.3358,
-    "median_wall_seconds": 0.335828,
-    "process_peak_rss_kib": 119324,
+    "median_cpu_seconds": 0.498738,
+    "median_wall_seconds": 0.499007,
+    "pages": 16,
+    "process_peak_rss_kib": 110832,
     "resources": 19,
-    "root_html_pages": 1,
     "swap_observed_kib": 0,
     "workers": 1
   },
@@ -132,7 +125,7 @@
         "same_orbit_pairs": 512,
         "scope": "two HTML resources, two IDs, two classes",
         "suite": "html",
-        "wall_seconds": 0.162179
+        "wall_seconds": 0.275243
       },
       {
         "bundles": 32,
@@ -144,10 +137,10 @@
         "same_orbit_pairs": 256,
         "scope": "two HTML, one CSS, one image, two IDs, two classes",
         "suite": "html-css-asset",
-        "wall_seconds": 0.062249
+        "wall_seconds": 0.093065
       }
     ],
-    "wall_seconds": 0.411869
+    "wall_seconds": 0.603288
   },
   "variant_campaign": {
     "baselines": {

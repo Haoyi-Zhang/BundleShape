@@ -45,7 +45,7 @@ def main() -> int:
     files=sorted(src.rglob('*.py'))
     if not files: raise SystemExit('no Python implementation files under src/')
     rows=[audit_file(p) for p in files]
-    for p in files: py_compile.compile(str(p),doraise=True)
+    for p in files: compile(p.read_text(encoding="utf-8"), str(p), "exec")
     checker=[r for r in rows if Path(r['path']).name=='checker_core.py']
     producer=[r for r in rows if Path(r['path']).name=='producer_core.py']
     assert checker and producer, 'producer_core.py and checker_core.py are required'
@@ -59,6 +59,7 @@ def main() -> int:
         'python_files':len(rows),
         'compiled_files':len(rows),
         'checker_imports_producer':False,
+        'parsing_core_independence': 'same-source duplicated core; import isolation is not independent implementation',
         'network_imports':0,
         'eval_or_exec_calls':0,
         'shell_true_calls':0,

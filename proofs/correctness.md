@@ -12,8 +12,13 @@ map of attributes; a class attribute denotes an unordered set. Each CSS resource
 has an ordered sequence of rules; a rule has an unordered selector list and an
 unordered map of distinct longhand declarations. Each asset has a finite byte
 string. Typed local-reference occurrences point to a resource and possibly a
-bundle-global ID. Comments and whitespace-only HTML text are absent from this
-abstract object.
+bundle-global ID. Comments are absent. HTML data callbacks separated only by comments form one
+maximal run; that run is newline- and NFC-normalized, and only a wholly blank run
+is removed. CSS uses single-pass zero-width prelexical comment erasure outside strings before
+the restricted scanner, which may join lexemes; the relation is not standard CSS
+token-stream or browser equivalence. Local transformations mean equality under
+these precisely declared normalizations, not unrestricted insertion inside any
+HTML lexical construct.
 
 Let `R`, `I`, and `C` be the finite sets of resource paths, IDs, and classes.
 An admissible renaming is a triple of bijections over these sets that preserves
@@ -104,8 +109,10 @@ After resource, ID, and class labels are fixed:
 normalization leaves these records unchanged, and every fixed local field is
 represented exactly.
 
-**Proof.** Sorting removes exactly the declared permutations. Comment and
-whitespace rules are applied before records are built. NFC/newline normalization
+**Proof.** Sorting removes exactly the declared permutations. For HTML, maximal data-run concatenation precedes NFC/newline normalization and
+blank-run deletion, so comments cannot introduce new text-record boundaries.
+CSS prelexical erasure precedes its scanner; surviving spaces still separate
+selector tokens and strings remain literal. NFC/newline normalization
 is deterministic. Literal fields and ordered positions are copied. Names and
 paths are replaced by the invariant labels of Lemmas 1-3. Base64 is injective on
 finite byte strings. QED.
@@ -157,25 +164,59 @@ replay/canonicalizer inconsistency in the implementation. QED.
 **Corollary 3 (mismatch).** If the checker accepts a `different` certificate, the
 endpoints are not equivalent.
 
-**Proof.** Acceptance means the checker reconstructed unequal canonical forms.
-By the contrapositive of Theorem 1 soundness, equivalent admitted bundles could
+**Proof.** Compact UTF-8 JSON serialization is injective on the canonical record
+types (strings, lists, string-keyed objects and their fixed primitive fields).
+For distinct byte strings there is a least unequal index before the shorter
+length or a strict-prefix EOF difference. The byte witness stores exactly this
+index, both lengths and both byte-or-null values. Recomputing it is total on
+unequal admitted canonical objects, including strings containing U+0085, U+2028
+or U+2029; it never splits lines. Acceptance therefore means the checker
+reconstructed unequal canonical forms. By the contrapositive of Theorem 1 soundness, equivalent admitted bundles could
 not have unequal canonical forms. QED.
 
 **Proposition 4 (admission witness).** Acceptance of an `out-of-language`
 certificate establishes only that the selected endpoint triggers the recorded
-first deterministic admission error. It makes no equivalence claim.
+first deterministic structural admission error. Sorted-name directory traversal
+and sorted resource validation fix the chosen error for quiescent identical
+inputs. Failed I/O and observed file changes raise `EnvironmentFailure`, for
+which neither a scientific certificate nor accepted out-of-language result is
+produced. This proposition makes no equivalence or atomic-snapshot claim.
 
-## 7. Termination and complexity
+## 7. Negative-witness size and post-admission complexity
 
-All parsed objects are finite and bounded. Manifest enumeration, parsing, and
-rooted traversal terminate. The traversal labels each resource once. ID/class
-scans visit each event and selector occurrence once. Local normalization sorts
-finite collections. With `S` the total admitted representation size and no
-single local collection larger than `S`, the straightforward implementation uses
-`O(S log S)` worst-case time and `O(S)` space, apart from output storage. The
-positive checker has the same asymptotic bound. Exact tiny-bundle oracle search
-is factorial in the number of names/resources and is used only as a bounded
-reference procedure.
+The full canonical object retains reversible base64 for exact binary assets.
+Only the negative witness is compacted. Let `m,n` be canonical byte lengths and
+`d=digits(max(1,m,n))`. There are three variable decimal fields (offset and two
+lengths), two integer-byte-or-null fields, two fixed 64-character digests and fixed
+schema keys. Even allocating 400 bytes for all fixed syntax/fields/newline gives
+`certificate_bytes <= 400+3d`.
+
+A deliberately loose bound for this fixed implementation is `m,n < 2^40`.
+Charge up to `2^16` serialized bytes to each consumed source byte: canonical
+records are shallow, fixed-field lists/dictionaries, not recursively copied
+subtrees; each HTML event/attribute and CSS selector/declaration occurrence is
+encoded once; source literal characters are encoded once with JSON escaping;
+references are replaced by bounded canonical labels; asset bytes expand by base64
+rather than recursive copying. This charge greatly exceeds each fixed record
+header, escaping expansion and bounded-label replacement (resource labels are
+at most three characters, name labels at most six here). Empty container/root
+headers contribute a fixed amount below 64 KiB. With at most 8 MiB consumed input,
+`2^16 * 8 MiB + 64 KiB < 2^40`. Thus `d<=13` and a negative certificate is at
+most 439 bytes under this conservative schema bound, strictly below 512 bytes
+and the 4-MiB protocol cap. The paired 2-MiB-asset regression verifies exact
+base64 round trips and real witness size; it is not the proof for all inputs.
+
+After admission, let `S` count the full finite abstract representation including
+literal bytes and reference/name occurrences. Rooted traversal labels each
+resource once, scans visit each occurrence, and local normalizations sort
+collections of total size `O(S)`. With constant-time symbol-table operations and
+the fixed-size atom/bounded-label model, this canonicalization/replay phase uses
+`O(S log S)` time and `O(S)` space apart from output storage. These are not
+bounds for filesystem access, standard-library HTML parsing, regex work on
+malformed text, OS delays or file races. All admission count caps are aggregate
+per bundle. CSS declarations are counted incrementally once each, avoiding the
+former rescan of all preceding rules at each new rule. The tiny oracle is
+factorial in name/resource counts and is only a finite reference procedure.
 
 ## 8. Failure modes excluded by the theorem
 
@@ -214,19 +255,21 @@ The proof quantifies over every admitted finite bundle. The experiments instead
 exercise concrete programs and finite cases:
 
 - 480 frozen metamorphic endpoint pairs;
-- 512 seeded combination/differential cases with producer/checker parser-outcome
-  agreement;
+- 512 seeded combination cases with same-source canonical-byte or structural
+  rejection-record consistency;
 - an exhaustive orbit comparison over 5,120 ordered tiny pairs and 18,176 tried
   candidate bijections;
-- 360 targeted certificate mutations;
-- 47 unit/boundary tests;
+- 360 mutation attempts on 72 base certificate instances (24 per decision, five each);
+- 84 unit/boundary tests;
 - one global-coupling negative control;
 - one bounded stress pair.
 
 The exhaustive oracle reuses producer-parsed abstract objects, so it tests
-canonical labeling against explicit bijection enumeration but is not an
-independent parser. The checker parser is a separate module; its tiny parse shapes
-and the 512 seeded serialized outcomes are compared against the producer, but both
-implementations still derive from one specification and research process. No finite campaign proves this written
-argument, and no written argument proves that Python's parsers or the delivered
-code are defect-free.
+canonical labeling against bijection enumeration, not independent parsing.
+The incoming producer/checker share 933 corresponding identical core lines, and
+the repaired cores remain same-source. Their separate packaging/import isolation
+provides no parser diversity. The 512 cases compare canonical bytes or rejection
+records, not complete abstract parser objects; tiny parse-shape checks inspect
+only resource keys, root and name orders. No finite campaign proves this
+written argument, and no written argument proves the Python implementation
+free from defects.

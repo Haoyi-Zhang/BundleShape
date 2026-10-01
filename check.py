@@ -12,7 +12,8 @@ from src.checker_core import verify_certificate
 
 
 def load_json(path: Path) -> Any:
-    raw = path.read_bytes()
+    with path.open("rb") as handle:
+        raw = handle.read(limits.MAX_CERT_BYTES + 1)
     if len(raw) > limits.MAX_CERT_BYTES:
         raise ValueError("certificate exceeds byte cap")
     def object_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -37,7 +38,7 @@ def main() -> int:
     except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as exc:
         verdict = {"accepted": False, "reason": f"certificate-input:{exc}"}
     print(json.dumps(verdict, sort_keys=True))
-    return 0 if verdict.get("accepted") else 2
+    return 3 if verdict.get("status") == "environment-error" else (0 if verdict.get("accepted") else 2)
 
 
 if __name__ == "__main__":

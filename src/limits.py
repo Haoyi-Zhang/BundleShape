@@ -4,6 +4,7 @@ FORMAT = "iwb-1"
 MAX_FILES = 64
 MAX_TOTAL_BYTES = 8 * 1024 * 1024
 MAX_TEXT_BYTES = 2 * 1024 * 1024
+# Event/rule/declaration limits are aggregate per bundle, not per resource.
 MAX_EVENTS = 10000
 MAX_RULES = 4000
 MAX_DECLARATIONS = 8000
@@ -61,7 +62,7 @@ ALLOWED_PROPERTIES = {
     "padding-bottom", "padding-left", "font-family", "font-size", "font-style",
     "font-weight", "line-height", "letter-spacing", "text-align",
     "text-decoration-line", "text-transform", "white-space", "list-style-type",
-    "object-fit", "vertical-align", "cursor", "gap", "row-gap", "column-gap",
+    "object-fit", "vertical-align", "cursor", "row-gap", "column-gap",
     "grid-template-columns", "grid-template-rows", "grid-column-start",
     "grid-column-end", "grid-row-start", "grid-row-end", "justify-content",
     "align-items", "align-content", "flex-direction", "flex-grow",

@@ -69,7 +69,7 @@ class CertificateTests(unittest.TestCase):
     def test_mismatch_witness_rejected_when_mutated(self):
         left = ARTIFACT / "fixtures/owned/fixture-00"
         right = ARTIFACT / "fixtures/variants/fixture-00/changed-text"
-        cert = make_certificate(left, right); cert["witness"]["line"] += 1
+        cert = make_certificate(left, right); cert["witness"]["offset"] += 1
         self.assertFalse(verify_certificate(left, right, cert)["accepted"])
 
     def test_rejection_witness_exact(self):

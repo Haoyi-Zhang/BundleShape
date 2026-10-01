@@ -98,7 +98,9 @@ def emit_stress_bundle(
     manifest = {"format": "iwb-1", "root": root_path, "resources": resources}
     _write(root / "bundle.json", json.dumps(manifest, indent=2, sort_keys=True) + "\n")
     return {
-        "pages": pages,
+        "content_pages": pages,
+        "root_html_pages": 1,
+        "html_resources": pages + 1,
         "blocks": total_blocks,
         "ids": total_blocks,
         "classes": total_blocks + 1,

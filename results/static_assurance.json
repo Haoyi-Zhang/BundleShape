@@ -39,6 +39,7 @@
         "hashlib",
         "html.parser",
         "json",
+        "os",
         "pathlib",
         "posixpath",
         "re",
@@ -47,7 +48,7 @@
         "unicodedata",
         "urllib.parse"
       ],
-      "lines": 1143,
+      "lines": 1236,
       "network_imports": [],
       "path": "src/checker_core.py",
       "shell_true_calls": 0
@@ -88,7 +89,7 @@
     {
       "forbidden_dynamic_calls": [],
       "imports": [],
-      "lines": 69,
+      "lines": 70,
       "network_imports": [],
       "path": "src/limits.py",
       "shell_true_calls": 0
@@ -103,6 +104,7 @@
         "hashlib",
         "html.parser",
         "json",
+        "os",
         "pathlib",
         "posixpath",
         "re",
@@ -111,7 +113,7 @@
         "unicodedata",
         "urllib.parse"
       ],
-      "lines": 967,
+      "lines": 1054,
       "network_imports": [],
       "path": "src/producer_core.py",
       "shell_true_calls": 0
@@ -126,7 +128,7 @@
         "posixpath",
         "shutil"
       ],
-      "lines": 108,
+      "lines": 110,
       "network_imports": [],
       "path": "src/stress_factory.py",
       "shell_true_calls": 0
@@ -147,6 +149,7 @@
     }
   ],
   "network_imports": 0,
+  "parsing_core_independence": "same-source duplicated core; import isolation is not independent implementation",
   "python_files": 9,
   "schema": "iwb-static-assurance",
   "shell_true_calls": 0

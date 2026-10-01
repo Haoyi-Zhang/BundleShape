@@ -14,7 +14,7 @@ import time
 from typing import Any, Callable
 
 from src.baselines import byte_inventory_equal, lexical_equal, local_alpha_equal, syntax_no_alpha_equal
-from src.checker_core import parse_bundle as checker_parse, verify_certificate
+from src.checker_core import AdmissionError as CheckerAdmissionError, parse_bundle as checker_parse, verify_certificate
 from src.exact_oracle import exact_equivalent_parsed
 from src.fixture_factory import (
     INVALID_VARIANTS,
@@ -24,7 +24,7 @@ from src.fixture_factory import (
     emit_owned_suite,
     emit_variant_suite,
 )
-from src.producer_core import canonical_digest, make_certificate, parse_bundle
+from src.producer_core import AdmissionError as ProducerAdmissionError, canonical_digest, make_certificate, parse_bundle
 from src.stress_factory import emit_stress_bundle
 from src.tiny_fixtures import emit_tiny_css_suite, emit_tiny_suite
 
@@ -162,7 +162,7 @@ def run_combination_campaign(root: Path, out: Path) -> dict[str, Any]:
         shutil.rmtree(campaign_root)
     failures: list[dict[str, Any]] = []
     decision_counts = {key: 0 for key in ["equivalent", "different", "out-of-language"]}
-    parser_agreements = 0
+    canonical_or_rejection_agreements = 0
     checker_accepts = 0
     certificate_bytes: list[int] = []
     mutation_counts: dict[str, int] = {}
@@ -193,37 +193,37 @@ def run_combination_campaign(root: Path, out: Path) -> dict[str, Any]:
         decision_counts[cert.get("decision", "missing")] = decision_counts.get(cert.get("decision", "missing"), 0) + 1
         checker_accepts += int(bool(verdict.get("accepted")))
 
-        parser_agreement = False
+        canonical_or_rejection_agreement = False
         try:
             lp = parse_bundle(left); lc = checker_parse(left)
             if expected == "out-of-language":
                 try:
                     parse_bundle(right)
-                except Exception as p_exc:
+                except ProducerAdmissionError as p_exc:
                     try:
                         checker_parse(right)
-                    except Exception as c_exc:
-                        parser_agreement = (
+                    except CheckerAdmissionError as c_exc:
+                        canonical_or_rejection_agreement = (
                             type(p_exc).__name__ == type(c_exc).__name__
                             and getattr(p_exc, "code", None) == getattr(c_exc, "code", None)
                             and getattr(p_exc, "location", None) == getattr(c_exc, "location", None)
                             and getattr(p_exc, "detail", None) == getattr(c_exc, "detail", None)
                         )
                 # The valid left endpoint must still agree byte-for-byte.
-                parser_agreement = parser_agreement and lp.canonical_bytes == lc.canonical_bytes
+                canonical_or_rejection_agreement = canonical_or_rejection_agreement and lp.canonical_bytes == lc.canonical_bytes
             else:
                 rp = parse_bundle(right); rc = checker_parse(right)
-                parser_agreement = lp.canonical_bytes == lc.canonical_bytes and rp.canonical_bytes == rc.canonical_bytes
+                canonical_or_rejection_agreement = lp.canonical_bytes == lc.canonical_bytes and rp.canonical_bytes == rc.canonical_bytes
         except Exception:
-            parser_agreement = False
-        parser_agreements += int(parser_agreement)
-        ok = cert.get("decision") == expected and bool(verdict.get("accepted")) and parser_agreement
+            canonical_or_rejection_agreement = False
+        canonical_or_rejection_agreements += int(canonical_or_rejection_agreement)
+        ok = cert.get("decision") == expected and bool(verdict.get("accepted")) and canonical_or_rejection_agreement
         if not ok and len(failures) < 20:
             failures.append({
                 "case": case_index, "expected": expected, "mutation": mutation,
                 "producer_decision": cert.get("decision"),
                 "checker_accepted": bool(verdict.get("accepted")),
-                "parser_agreement": parser_agreement, "options": options,
+                "canonical_or_rejection_agreement": canonical_or_rejection_agreement, "options": options,
             })
     result = {
         "seed": seed,
@@ -231,8 +231,8 @@ def run_combination_campaign(root: Path, out: Path) -> dict[str, Any]:
         "expected_counts": {key: labels.count(key) for key in ["equivalent", "different", "out-of-language"]},
         "producer_counts": decision_counts,
         "checker_accepted": checker_accepts,
-        "producer_checker_parser_agreements": parser_agreements,
-        "all_expected_and_checked": not failures and checker_accepts == len(labels) and parser_agreements == len(labels),
+        "producer_checker_canonical_or_rejection_agreements": canonical_or_rejection_agreements,
+        "all_expected_and_checked": not failures and checker_accepts == len(labels) and canonical_or_rejection_agreements == len(labels),
         "mutation_counts": dict(sorted(mutation_counts.items())),
         "certificate_bytes": {
             "min": min(certificate_bytes),
@@ -331,7 +331,7 @@ def _mutations(cert: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
             c["id_map"][keys[0]] = "not-a-target"
         cases.append(("wrong-id-map", c))
     elif decision == "different":
-        c = copy.deepcopy(cert); c["witness"]["line"] += 1; cases.append(("wrong-line", c))
+        c = copy.deepcopy(cert); c["witness"]["offset"] += 1; cases.append(("wrong-offset", c))
         c = copy.deepcopy(cert); c["left_digest"] = "0" * 64; cases.append(("wrong-left-digest", c))
         c = copy.deepcopy(cert); c["right_digest"] = "f" * 64; cases.append(("wrong-right-digest", c))
         c = copy.deepcopy(cert); c["unexpected"] = 1; cases.append(("unknown-field", c))
@@ -358,7 +358,8 @@ def run_mutations(root: Path, out: Path) -> dict[str, Any]:
         ]
         for target in targets:
             cert = make_certificate(base, target)
-            bucket = by_decision.setdefault(cert["decision"], {"attempts": 0, "accepted": 0})
+            bucket = by_decision.setdefault(cert["decision"], {"base_certificates": 0, "attempts": 0, "accepted": 0})
+            bucket["base_certificates"] += 1
             for label, mutated in _mutations(cert):
                 verdict = verify_certificate(base, target, mutated)
                 attempts += 1; bucket["attempts"] += 1
@@ -366,6 +367,8 @@ def run_mutations(root: Path, out: Path) -> dict[str, Any]:
                     accepted += 1; bucket["accepted"] += 1
                     examples.append({"fixture": index, "decision": cert["decision"], "mutation": label})
     result = {
+        "base_certificates": sum(b["base_certificates"] for b in by_decision.values()),
+        "mutations_per_base_certificate": 5,
         "mutations": attempts,
         "incorrectly_accepted": accepted,
         "rejected": attempts - accepted,
@@ -454,7 +457,7 @@ def main() -> int:
     parser.add_argument("--out", default="results")
     args = parser.parse_args()
     root = Path(__file__).resolve().parent
-    out = root / args.out
+    out = Path(args.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     start_wall = time.perf_counter(); start_cpu = time.process_time()
     records, variants = run_variant_campaign(root, out)
@@ -488,7 +491,12 @@ def main() -> int:
         "stress_decision": stress["decision"],
         "wall_seconds": overall["campaign"]["wall_seconds"],
     }, sort_keys=True))
-    return 0
+    ok = (variants["proposed_correct"] == variants["pairs"]
+          and combinations["all_expected_and_checked"] and not oracle["disagreements"]
+          and not mutations["incorrectly_accepted"] and coupling["checker_accepted"]
+          and coupling["producer_decision"] == "different" and stress["checker_accepted"]
+          and stress["canonical_equal"])
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":

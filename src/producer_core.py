@@ -1,7 +1,7 @@
-"""Trusted producer-side parser and canonicalizer for inert web bundles.
+"""Producer-side IWB implementation.
 
-This module never renders HTML, executes scripts, follows network references, or
-loads browser engines.  It accepts a deliberately conservative HTML/CSS subset.
+The parsing/canonicalization core is a same-source module copy, not an
+independently implemented parser. It never renders or executes webpage content.
 """
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ import base64
 from hashlib import sha256
 from html.parser import HTMLParser
 import json
+import os
 import posixpath
 import re
 import stat
@@ -31,11 +32,88 @@ class AdmissionError(ValueError):
         super().__init__(f"{code} at {location}: {detail}")
         self.code = code
         self.location = location
-        self.detail = detail
+        self.detail = detail if len(detail) <= 256 else detail[:240] + "...[truncated]"
 
     def as_dict(self) -> dict[str, str]:
         return {"code": self.code, "location": self.location, "detail": self.detail}
 
+
+
+class EnvironmentFailure(RuntimeError):
+    """I/O, permission, or observed snapshot instability: no language verdict."""
+    def __init__(self, code: str, location: str, detail: str):
+        super().__init__(f"{code} at {location}: {detail}")
+        self.code, self.location, self.detail = code, location, detail
+
+    def as_dict(self) -> dict[str, str]:
+        return {"code": self.code, "location": self.location, "detail": self.detail}
+
+
+def _stat_signature(st: os.stat_result) -> tuple[int, ...]:
+    return (st.st_dev, st.st_ino, st.st_mode, st.st_size, st.st_mtime_ns, st.st_ctime_ns)
+
+
+def _regular_stat(path: Path, location: str) -> os.stat_result:
+    try:
+        st = path.lstat()
+    except OSError as exc:
+        raise EnvironmentFailure("stat-failed", location, type(exc).__name__) from exc
+    if stat.S_ISLNK(st.st_mode):
+        raise AdmissionError("symlink", location, "symlinks are forbidden")
+    if not stat.S_ISREG(st.st_mode):
+        raise AdmissionError("nonregular-file", location, "only regular files are admitted")
+    return st
+
+
+def _read_stable(path: Path, location: str, before: os.stat_result, cap: int) -> bytes:
+    """Bound the read and reject observed changes, without claiming atomic snapshots."""
+    try:
+        with path.open("rb") as handle:
+            opened = os.fstat(handle.fileno())
+            if _stat_signature(before) != _stat_signature(opened):
+                raise EnvironmentFailure("file-changed", location, "changed before read")
+            data = handle.read(cap + 1)
+            after_read = os.fstat(handle.fileno())
+        after_path = path.lstat()
+    except OSError as exc:
+        raise EnvironmentFailure("read-failed", location, type(exc).__name__) from exc
+    if (len(data) != before.st_size or len(data) > cap
+            or _stat_signature(before) != _stat_signature(after_read)
+            or _stat_signature(before) != _stat_signature(after_path)):
+        raise EnvironmentFailure("file-changed", location, "changed during read")
+    return data
+
+
+def _directory_entries(directory: Path, root: Path) -> list[Path]:
+    try:
+        with os.scandir(directory) as entries:
+            names = sorted(entry.name for entry in entries)
+    except OSError as exc:
+        raise EnvironmentFailure("directory-read-failed", directory.relative_to(root).as_posix(),
+                                 type(exc).__name__) from exc
+    return [directory / name for name in names]
+
+
+def _inventory(root: Path) -> set[str]:
+    """Lexicographic-name depth-first traversal; never follow directory symlinks."""
+    found: set[str] = set()
+    pending = list(reversed(_directory_entries(root, root)))
+    while pending:
+        path = pending.pop()
+        rel = path.relative_to(root).as_posix()
+        try:
+            st = path.lstat()
+        except OSError as exc:
+            raise EnvironmentFailure("stat-failed", rel, type(exc).__name__) from exc
+        if stat.S_ISLNK(st.st_mode):
+            raise AdmissionError("symlink", rel, "symlinks are forbidden")
+        if stat.S_ISDIR(st.st_mode):
+            pending.extend(reversed(_directory_entries(path, root)))
+        elif not stat.S_ISREG(st.st_mode):
+            raise AdmissionError("nonregular-file", rel, "only regular files and directories are admitted")
+        elif rel != "bundle.json":
+            found.add(rel)
+    return found
 
 def _nfc(value: str) -> str:
     return unicodedata.normalize("NFC", value.replace("\r\n", "\n").replace("\r", "\n"))
@@ -72,10 +150,12 @@ def _safe_manifest_path(value: str, location: str) -> str:
         raise AdmissionError("bad-path", location, "path must be a nonempty bounded string")
     if "\\" in value or "\x00" in value:
         raise AdmissionError("bad-path", location, "backslashes and NUL are forbidden")
-    p = PurePosixPath(value)
-    if p.is_absolute() or any(part in {"", ".", ".."} for part in p.parts):
+    # Validate raw components before PurePosixPath can erase '.' or empty parts.
+    if any(part in {"", ".", ".."} for part in value.split("/")):
         raise AdmissionError("bad-path", location, "path must be normalized and relative")
-    return str(p)
+    if any(0xD800 <= ord(ch) <= 0xDFFF for ch in value):
+        raise AdmissionError("bad-path", location, "surrogate code points are forbidden")
+    return str(PurePosixPath(value))
 
 
 def _valid_name(value: str, location: str) -> str:
@@ -88,7 +168,10 @@ def _resolve_ref(base_path: str, raw: str, location: str) -> tuple[str | None, s
     raw = _nfc(raw.strip())
     if not raw:
         raise AdmissionError("bad-reference", location, "empty reference")
-    parts = urlsplit(raw)
+    try:
+        parts = urlsplit(raw)
+    except ValueError as exc:
+        raise AdmissionError("bad-reference", location, "malformed URL syntax") from exc
     if parts.scheme or parts.netloc or parts.query:
         raise AdmissionError("external-reference", location, "schemes, authorities, and queries are outside the model")
     if parts.path.startswith("/") or "\\" in parts.path:
@@ -119,12 +202,26 @@ class _HTMLCollector(HTMLParser):
         self.events: list[HtmlEvent] = []
         self.stack: list[str] = []
         self.seen_doctype = False
+        self._text_parts: list[str] = []
+        self._text_position = (1, 1)
+
+    def _flush_text(self) -> None:
+        # A maximal data run may cross comments or parser callback boundaries.
+        # Normalize only after concatenation; never erase a space within a run.
+        if not self._text_parts:
+            return
+        data = _nfc("".join(self._text_parts))
+        self._text_parts.clear()
+        if data and not data.isspace():
+            line, col = self._text_position
+            self.events.append(HtmlEvent("text", data, line, col))
 
     def _loc(self) -> str:
         line, col = self.getpos()
         return f"{self.path}:{line}:{col + 1}"
 
     def _record_start(self, tag: str, attrs: list[tuple[str, str | None]], self_closing: bool) -> None:
+        self._flush_text()
         tag = tag.lower()
         if tag in limits.FORBIDDEN_TAGS or tag not in limits.ALLOWED_TAGS:
             raise AdmissionError("forbidden-tag", self._loc(), tag)
@@ -160,6 +257,7 @@ class _HTMLCollector(HTMLParser):
             self.stack.append(tag)
 
     def handle_decl(self, decl: str) -> None:
+        self._flush_text()
         if decl.strip().lower() != "doctype html" or self.seen_doctype or self.events:
             raise AdmissionError("bad-doctype", self._loc(), decl)
         self.seen_doctype = True
@@ -173,6 +271,7 @@ class _HTMLCollector(HTMLParser):
         self._record_start(tag, attrs, True)
 
     def handle_endtag(self, tag: str) -> None:
+        self._flush_text()
         tag = tag.lower()
         if tag in limits.VOID_TAGS:
             raise AdmissionError("void-end-tag", self._loc(), tag)
@@ -183,15 +282,13 @@ class _HTMLCollector(HTMLParser):
         self.events.append(HtmlEvent("end", tag, line, col + 1))
 
     def handle_data(self, data: str) -> None:
-        data = _nfc(data)
-        if not data or data.isspace():
-            return
-        line, col = self.getpos()
-        self.events.append(HtmlEvent("text", data, line, col + 1))
+        if not self._text_parts:
+            line, col = self.getpos()
+            self._text_position = (line, col + 1)
+        self._text_parts.append(data)
 
     def handle_comment(self, data: str) -> None:
-        # Comments are deliberately outside the compared structure.  They carry
-        # no reference or renamable occurrence in this restricted language.
+        # A comment emits no event and does not end a maximal text run.
         return
 
     def handle_pi(self, data: str) -> None:
@@ -201,7 +298,10 @@ class _HTMLCollector(HTMLParser):
         raise AdmissionError("unknown-declaration", self._loc(), data[:80])
 
     def close_checked(self) -> None:
+        if self.rawdata.startswith("<!--"):
+            raise AdmissionError("bad-html-comment", self._loc(), "unterminated comment")
         super().close()
+        self._flush_text()
         if self.stack:
             raise AdmissionError("unbalanced-html", self.path, f"unclosed tag {self.stack[-1]}")
         if not self.seen_doctype:
@@ -313,7 +413,7 @@ def _selector_tokens(selector: str, location: str) -> tuple[str, ...]:
 
 
 def _strip_css_comments(text: str, location: str) -> str:
-    """Remove comments outside quoted strings and reject unterminated comments."""
+    """Single-pass zero-width prelexical erasure outside strings, not CSS semantics."""
     out: list[str] = []
     i = 0
     quote: str | None = None
@@ -334,7 +434,8 @@ def _strip_css_comments(text: str, location: str) -> str:
             end = text.find("*/", i + 2)
             if end < 0:
                 raise AdmissionError("bad-css", location, "unterminated comment")
-            out.append(" ")
+            # IWB explicitly uses zero-width prelexical erasure, not a claim
+            # of equivalence between browser CSS token streams.
             i = end + 2
             continue
         out.append(ch)
@@ -465,6 +566,7 @@ def _parse_css(text: str, path: str) -> tuple[CssRule, ...]:
     if "@" in text:
         raise AdmissionError("at-rule", path, "at-rules are outside the model")
     rules: list[CssRule] = []
+    declaration_count = 0
     i = 0
     n = len(text)
     while i < n:
@@ -522,10 +624,13 @@ def _parse_css(text: str, path: str) -> tuple[CssRule, ...]:
                 raise AdmissionError("unsupported-value", rule_loc, value)
             seen_props.add(prop)
             declarations.append((prop, value))
+            declaration_count += 1
+            if declaration_count > limits.MAX_DECLARATIONS:
+                raise AdmissionError("too-much-css", path, "rule/declaration bound exceeded")
         if not declarations:
             raise AdmissionError("empty-rule", rule_loc, selector_text)
         rules.append(CssRule(selectors, tuple(declarations), len(rules)))
-        if len(rules) > limits.MAX_RULES or sum(len(r.declarations) for r in rules) > limits.MAX_DECLARATIONS:
+        if len(rules) > limits.MAX_RULES:
             raise AdmissionError("too-much-css", path, "rule/declaration bound exceeded")
         i = close_brace + 1
     return tuple(rules)
@@ -744,29 +849,24 @@ def parse_bundle(root_dir: str | Path) -> ParsedBundle:
     try:
         root_stat = supplied_root.lstat()
     except OSError as exc:
-        raise AdmissionError("missing-manifest", "bundle.json", str(exc)) from exc
+        raise EnvironmentFailure("root-unavailable", ".", type(exc).__name__) from exc
     if stat.S_ISLNK(root_stat.st_mode):
         raise AdmissionError("symlink", ".", "bundle root may not be a symlink")
     if not stat.S_ISDIR(root_stat.st_mode):
-        raise AdmissionError("missing-manifest", "bundle.json", "bundle root is not a directory")
-    root_path = supplied_root.resolve()
-    manifest_path = root_path / "bundle.json"
+        raise AdmissionError("not-directory", ".", "bundle root is not a directory")
     try:
-        manifest_stat = manifest_path.lstat()
-    except OSError as exc:
-        raise AdmissionError("missing-manifest", "bundle.json", str(exc)) from exc
-    if stat.S_ISLNK(manifest_stat.st_mode):
-        raise AdmissionError("symlink", "bundle.json", "symlinks are forbidden")
-    if not stat.S_ISREG(manifest_stat.st_mode):
-        raise AdmissionError("nonregular-file", "bundle.json", "manifest must be a regular file")
+        root_path = supplied_root.resolve()
+    except (OSError, RuntimeError) as exc:
+        raise EnvironmentFailure("root-unavailable", ".", type(exc).__name__) from exc
+    # Absence observed by a successful inventory is structural. A later failed
+    # stat/read is an environmental failure, not proof of language exclusion.
+    if "bundle.json" not in {p.name for p in _directory_entries(root_path, root_path)}:
+        raise AdmissionError("missing-manifest", "bundle.json", "absent from directory inventory")
+    manifest_path = root_path / "bundle.json"
+    manifest_stat = _regular_stat(manifest_path, "bundle.json")
     if manifest_stat.st_size > limits.MAX_TEXT_BYTES:
         raise AdmissionError("manifest-too-large", "bundle.json", str(manifest_stat.st_size))
-    try:
-        raw_manifest = manifest_path.read_bytes()
-    except OSError as exc:
-        raise AdmissionError("missing-manifest", "bundle.json", str(exc)) from exc
-    if len(raw_manifest) != manifest_stat.st_size:
-        raise AdmissionError("file-changed", "bundle.json", "size changed while reading")
+    raw_manifest = _read_stable(manifest_path, "bundle.json", manifest_stat, limits.MAX_TEXT_BYTES)
     try:
         manifest = _strict_json_loads(raw_manifest, "bundle.json")
     except AdmissionError as exc:
@@ -782,37 +882,17 @@ def parse_bundle(root_dir: str | Path) -> ParsedBundle:
     listed = [_safe_manifest_path(v, f"bundle.json:resources[{i}]") for i, v in enumerate(raw_resources)]
     if len(listed) != len(set(listed)) or root not in listed:
         raise AdmissionError("bad-resource-list", "bundle.json", "duplicates or missing root")
-    actual_files: set[str] = set()
-    for p in root_path.rglob("*"):
-        rel = p.relative_to(root_path).as_posix()
-        try:
-            entry_stat = p.lstat()
-        except OSError as exc:
-            raise AdmissionError("file-changed", rel, str(exc)) from exc
-        if stat.S_ISLNK(entry_stat.st_mode):
-            raise AdmissionError("symlink", rel, "symlinks are forbidden")
-        if stat.S_ISDIR(entry_stat.st_mode):
-            continue
-        if not stat.S_ISREG(entry_stat.st_mode):
-            raise AdmissionError("nonregular-file", rel, "only regular files and directories are admitted")
-        if rel != "bundle.json":
-            actual_files.add(rel)
+    actual_files = _inventory(root_path)
     if actual_files != set(listed):
         missing = sorted(set(listed) - actual_files)
         extra = sorted(actual_files - set(listed))
         raise AdmissionError("manifest-file-mismatch", "bundle.json", f"missing={missing[:1]} extra={extra[:1]}")
     total = len(raw_manifest)
     resources: dict[str, dict[str, Any]] = {}
-    for rel in listed:
+    html_events = css_rules = css_declarations = 0
+    for rel in sorted(listed):
         file_path = root_path / rel
-        try:
-            file_stat = file_path.lstat()
-        except OSError as exc:
-            raise AdmissionError("file-changed", rel, str(exc)) from exc
-        if stat.S_ISLNK(file_stat.st_mode):
-            raise AdmissionError("symlink", rel, "symlinks are forbidden")
-        if not stat.S_ISREG(file_stat.st_mode):
-            raise AdmissionError("nonregular-file", rel, "resource must be a regular file")
+        file_stat = _regular_stat(file_path, rel)
         projected_total = total + file_stat.st_size
         if projected_total > limits.MAX_TOTAL_BYTES:
             raise AdmissionError("bundle-too-large", "bundle.json", str(projected_total))
@@ -821,12 +901,10 @@ def parse_bundle(root_dir: str | Path) -> ParsedBundle:
             raise AdmissionError("unsupported-resource", rel, suffix)
         if suffix in {".html", ".css"} and file_stat.st_size > limits.MAX_TEXT_BYTES:
             raise AdmissionError("text-too-large", rel, str(file_stat.st_size))
-        try:
-            data = file_path.read_bytes()
-        except OSError as exc:
-            raise AdmissionError("file-changed", rel, str(exc)) from exc
-        if len(data) != file_stat.st_size:
-            raise AdmissionError("file-changed", rel, "size changed while reading")
+        cap = limits.MAX_TOTAL_BYTES - total
+        if suffix in {".html", ".css"}:
+            cap = min(cap, limits.MAX_TEXT_BYTES)
+        data = _read_stable(file_path, rel, file_stat, cap)
         total += len(data)
         if suffix in {".html", ".css"}:
             try:
@@ -835,13 +913,13 @@ def parse_bundle(root_dir: str | Path) -> ParsedBundle:
                 raise AdmissionError("non-utf8", rel, str(exc)) from exc
             if suffix == ".html":
                 parser = _HTMLCollector(rel)
-                try:
-                    parser.feed(text)
-                    parser.close_checked()
-                except AdmissionError:
-                    raise
-                except Exception as exc:
-                    raise AdmissionError("bad-html", rel, str(exc)) from exc
+                # Unexpected parser/program failures propagate; they must not
+                # become certified structural admission failures.
+                parser.feed(text)
+                parser.close_checked()
+                html_events += len(parser.events)
+                if html_events > limits.MAX_EVENTS:
+                    raise AdmissionError("too-many-events", "bundle.json", str(html_events))
                 refs: list[tuple[str, str | None, str]] = []
                 for event in parser.events:
                     if event.kind == "start":
@@ -850,6 +928,10 @@ def parse_bundle(root_dir: str | Path) -> ParsedBundle:
                 resources[rel] = {"kind": "html", "events": parser.events, "refs": refs, "bytes": data}
             else:
                 rules = _parse_css(text, rel)
+                css_rules += len(rules)
+                css_declarations += sum(len(rule.declarations) for rule in rules)
+                if css_rules > limits.MAX_RULES or css_declarations > limits.MAX_DECLARATIONS:
+                    raise AdmissionError("too-much-css", "bundle.json", "bundle rule/declaration bound exceeded")
                 refs = _css_refs(rel, rules)
                 resources[rel] = {"kind": "css", "rules": rules, "refs": refs, "bytes": data}
         else:
@@ -923,17 +1005,22 @@ def canonical_digest(bundle: ParsedBundle) -> str:
 
 
 def first_mismatch(left: ParsedBundle, right: ParsedBundle) -> dict[str, Any] | None:
-    if left.canonical_obj == right.canonical_obj:
+    """Bounded, injective UTF-8 byte comparison; no Unicode line splitting.
+
+    Exact asset bytes remain in canonical records, reversibly base64 encoded.
+    The witness carries only the first byte difference (or EOF) and lengths;
+    the checker reconstructs the full records instead of trusting digests.
+    """
+    a, b = left.canonical_bytes, right.canonical_bytes
+    if a == b:
         return None
-    a = json.dumps(left.canonical_obj, ensure_ascii=False, sort_keys=True, indent=2).splitlines()
-    b = json.dumps(right.canonical_obj, ensure_ascii=False, sort_keys=True, indent=2).splitlines()
-    upto = max(len(a), len(b))
-    for i in range(upto):
-        av = a[i] if i < len(a) else None
-        bv = b[i] if i < len(b) else None
-        if av != bv:
-            return {"line": i + 1, "left": av, "right": bv}
-    raise AssertionError("objects differ without textual mismatch")
+    end = min(len(a), len(b))
+    offset = 0
+    while offset < end and a[offset] == b[offset]:
+        offset += 1
+    return {"offset": offset, "left": a[offset] if offset < len(a) else None,
+            "right": b[offset] if offset < len(b) else None,
+            "left_length": len(a), "right_length": len(b)}
 
 
 def make_certificate(left_dir: str | Path, right_dir: str | Path) -> dict[str, Any]:

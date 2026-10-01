@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -38,7 +39,9 @@ def normalized(name: str, obj: Any) -> Any:
     elif name == "unit-summary.json":
         obj.pop("wall_seconds", None)
     elif name == "evaluation-summary.json":
-        obj.pop("campaign", None)
+        if "campaign" in obj:
+            obj["campaign"].pop("wall_seconds", None)
+            obj["campaign"].pop("cpu_seconds", None)
         if "combination_campaign" in obj:
             obj["combination_campaign"].pop("wall_seconds", None)
         if "tiny_oracle" in obj:
@@ -54,6 +57,25 @@ def normalized(name: str, obj: Any) -> Any:
     return obj
 
 
+def telemetry_valid(obj: Any) -> bool:
+    """Measurements are not expected to be identical, but must be well-formed."""
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            if key.endswith(("seconds", "rss_kib")):
+                values = value if isinstance(value, list) else [value]
+                if any(type(v) not in (int, float) or not math.isfinite(v) or v < 0 for v in values):
+                    return False
+                if key == "process_peak_rss_kib" and value > 512 * 1024:
+                    return False
+            elif key == "swap_observed_kib" and value not in (None, 0):
+                return False
+            if not telemetry_valid(value):
+                return False
+    elif isinstance(obj, list):
+        return all(telemetry_valid(v) for v in obj)
+    return True
+
+
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--actual", required=True, type=Path)
@@ -66,7 +88,8 @@ def main() -> int:
             mismatches.append(name)
     for name in ["combination-summary.json", "oracle-summary.json", "stress-summary.json", "unit-summary.json", "evaluation-summary.json"]:
         a = args.actual / name; e = args.expected / name
-        if not a.exists() or not e.exists() or normalized(name, load(a)) != normalized(name, load(e)):
+        if (not a.exists() or not e.exists() or not telemetry_valid(load(a))
+                or normalized(name, load(a)) != normalized(name, load(e))):
             mismatches.append(name)
     result = {"matched": not mismatches, "mismatches": mismatches, "compared": len(EXACT) + 5}
     print(json.dumps(result, sort_keys=True))

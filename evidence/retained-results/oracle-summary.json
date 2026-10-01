@@ -17,7 +17,7 @@
       "same_orbit_pairs": 512,
       "scope": "two HTML resources, two IDs, two classes",
       "suite": "html",
-      "wall_seconds": 0.162179
+      "wall_seconds": 0.275243
     },
     {
       "bundles": 32,
@@ -29,8 +29,8 @@
       "same_orbit_pairs": 256,
       "scope": "two HTML, one CSS, one image, two IDs, two classes",
       "suite": "html-css-asset",
-      "wall_seconds": 0.062249
+      "wall_seconds": 0.093065
     }
   ],
-  "wall_seconds": 0.411869
+  "wall_seconds": 0.603288
 }

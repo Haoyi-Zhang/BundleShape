@@ -2,8 +2,8 @@
   "all_expected_and_checked": true,
   "certificate_bytes": {
     "max": 612,
-    "median": 434.0,
-    "min": 145
+    "median": 531.5,
+    "min": 146
   },
   "checker_accepted": 512,
   "expected_counts": {
@@ -24,12 +24,12 @@
     "swap_siblings": 37
   },
   "pairs": 512,
-  "producer_checker_canonical_or_rejection_agreements": 512,
+  "producer_checker_parser_agreements": 512,
   "producer_counts": {
     "different": 160,
     "equivalent": 256,
     "out-of-language": 96
   },
   "seed": 20260917,
-  "wall_seconds": 6.137073
+  "wall_seconds": 9.60791
 }

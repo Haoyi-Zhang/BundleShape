@@ -1,226 +1,159 @@
 # Certified structural equivalence for anchored inert web bundles
 
-This standalone artifact implements and evaluates a deliberately restricted,
-non-executable source language for comparing small HTML/CSS/resource bundles.
-It never starts a browser, executes JavaScript, submits a form, follows a network
-URL, renders a page, or calls a model API. The artifact is intended for defensive
-static analysis and for checking the paper's finite evidence.
+This standalone artifact concerns a finite, static IWB language, not a browser
+model, phishing detector, provenance proof or arbitrary HTML/CSS equivalence.
+It reads owned benign local fixtures; no scripts, forms, browser, network, GPU,
+model API or external scientific service are executed. The project remains an
+internal TSE-oriented research draft, not a submitted or accepted paper.
 
-The central object is an **anchored inert web bundle** (IWB): a manifest, one
-root HTML document, reachable local HTML/CSS files, and local image bytes. The
-admission rules remove active content and the difficult ambiguous cases that
-would invalidate the stated canonicalization theorem. Within the admitted
-language, the implementation ignores only declared reorderings and applies one
-global bijection to resource paths, HTML IDs, and CSS classes.
+## Claims and trusted base
 
-## What is claimed
+`proofs/correctness.md` gives written (not machine-checked) arguments for the
+declared admitted relation. Exact asset bytes are reversibly base64-encoded in
+canonical records; digests alone never decide equality. Positive certificates
+carry one total resource/ID/class correspondence. Negative certificates identify
+the first canonical UTF-8 byte difference or EOF, not a minimum explanation.
+Out-of-language certificates concern a deterministic structural exclusion only.
 
-The artifact supports four bounded claims.
+**Common-origin disclosure:** incoming producer lines 5–937 and checker lines
+6–938 are 933 corresponding identical core lines. The repaired parsing and
+canonicalization cores remain same-source. Separate modules and no checker
+import of the producer do not mean independent implementation. The 512-case
+experiment compares canonical bytes or structural rejection records, not complete
+parser objects. The tiny oracle reuses producer-parsed objects; its additional
+shape comparison covers only resource keys, root and name orders.
 
-1. The written proof in `proofs/correctness.md` shows that, for the admitted
-   language, two bundles have the same canonical form exactly when they differ
-   only by the declared global renamings and reorderings. Binary resources are
-   represented by their exact base64 bytes in the canonical form, not only by a
-   digest.
-2. An equivalent certificate contains total resource/ID/class bijections. The
-   separately packaged checker reparses both endpoints, validates the maps, and
-   replays the mapping over HTML, CSS, references, and exact asset bytes.
-3. A different certificate identifies the first deterministic mismatch between
-   the checker's reconstructed canonical forms. An out-of-language certificate
-   identifies the exact deterministic admission error. These witnesses are
-   checkable but are not claimed to be minimum explanations.
-4. The retained finite evidence contains 480 frozen metamorphic pairs, 512
-   seeded combination/differential cases, 5,120 ordered tiny-bundle pairs checked
-   against exhaustive bijection search, 360 mutated certificates, 47 unit and
-   boundary tests, a cross-resource coupling negative control, and one bounded
-   stress instance. Finite agreement is implementation evidence, not a universal
-   proof or real-world detection accuracy.
+## Run the delivered commands
 
-The artifact does **not** claim browser-behavior equivalence, visual equivalence,
-semantic JavaScript equivalence, malicious-site provenance, authorship
-attribution, or coverage of arbitrary web applications. It also does not claim
-that the checker was independently authored or formally verified.
+Requirements: Linux/POSIX, Python 3.10+ and its standard library. From a fresh
+extraction (or invoke the script by absolute path from any directory):
 
-## Requirements
+```sh
+python reproduce.py --out reproduced
+```
 
-- Linux or another POSIX-like environment
-- Python 3.10 or newer
-- Python standard library only
-- one worker; no network, GPU, model API, browser, or service
-
-The measured campaign used one process and no child workers. Its largest retained
-stress instance stayed below the project's 512 MiB per-process address-space
-choice. Timing and peak RSS are observations and are excluded from exact-output
-comparison.
-
-## Reproduce the retained evidence
-
-From the extracted artifact root:
+The driver pins one CPU where available, imposes a 512-MiB address-space cap,
+executes one child at a time, and stops on error. Scientific evaluation itself
+uses one process and no child workers. No downloads are performed. Equivalent
+individual commands, from the repository root, are:
 
 ```sh
 python generate_fixtures.py
-rm -rf reproduced
 python test.py --out reproduced
 python evaluate.py --out reproduced
+python static_assurance.py --out reproduced
+python repair_acceptance.py --out reproduced
 python verify_results.py --actual reproduced --expected results
 ```
 
-Expected final line from the comparator:
+The final comparator checks **ten named result files** and prints
+`{"compared": 10, "matched": true, "mismatches": []}` on success.
+Five files are byte-exact. Five JSON comparisons remove only documented
+wall/CPU/RSS/swap telemetry fields; all scientific fields, worker counts,
+decisions, counts and lengths remain exact. New measurements must be finite,
+non-negative and within the stated RSS/swap guard. This is not bit-identical
+performance reproduction. The additional static result is checked separately.
 
-```json
-{"compared": 10, "matched": true, "mismatches": []}
-```
+## Certificate CLI
 
-`evaluate.py` regenerates the owned base and variant suites, then materializes the
-deterministic combination and stress working sets before measuring. The comparison is byte-exact for deterministic CSV/JSON fields and removes only
-run-specific wall time, process time, peak RSS, and swap observations. A passing
-comparison confirms reproduction of the retained finite outputs; it does not
-prove the mathematical theorem or external validity.
-
-## Use the certificate interface
-
-Produce and check an equivalent certificate:
+Choose a fresh output name; existing outputs are deliberately not overwritten.
 
 ```sh
-python certify.py \
-  fixtures/owned/fixture-00 \
-  fixtures/variants/fixture-00/combined-all \
-  --output /tmp/equivalent.json
-python check.py \
-  fixtures/owned/fixture-00 \
-  fixtures/variants/fixture-00/combined-all \
-  /tmp/equivalent.json
-```
-
-Produce and check a structural mismatch:
-
-```sh
-python certify.py \
-  fixtures/owned/fixture-00 \
-  fixtures/variants/fixture-00/changed-text \
-  --output /tmp/different.json
-python check.py \
-  fixtures/owned/fixture-00 \
-  fixtures/variants/fixture-00/changed-text \
-  /tmp/different.json
-```
-
-Inspect one canonical form:
-
-```sh
+python certify.py fixtures/owned/fixture-00 fixtures/variants/fixture-00/combined-all --output equivalent.json
+python check.py fixtures/owned/fixture-00 fixtures/variants/fixture-00/combined-all equivalent.json
+python certify.py fixtures/owned/fixture-00 fixtures/variants/fixture-00/changed-text --output different.json
+python check.py fixtures/owned/fixture-00 fixtures/variants/fixture-00/changed-text different.json
 python canonicalize.py fixtures/owned/fixture-00
 ```
 
-The producer refuses to overwrite an existing certificate output. The checker
-returns exit status 0 only for an accepted certificate. Read the printed
-`decision`: an accepted `different` or `out-of-language` certificate is not a
-positive clone match. Rejection of a certificate proves neither equivalence nor
-difference.
+The CLI calls the checker **before** opening certificate output, bounds compact
+ASCII JSON to 4 MiB, and uses exclusive creation. Library `make_certificate`
+only proposes a certificate. Checker rejection is not the opposite verdict.
+Permission/I/O/transient read failures produce environmental non-acceptance,
+not an accepted out-of-language claim. CLI environmental status is exit 3.
+A successfully observed missing listed resource is instead a structural error.
 
-## Frozen result summary
+## Precisely normalized boundaries
 
-`results/evaluation-summary.json` records:
+HTML comments do not split data runs: concatenate callbacks until a structural
+event, normalize newline/NFC, then remove a wholly blank run. Thus `ab` and
+`a<!--c-->b` agree, but `a<!--c--> b` retains its internal space. Real tags
+separate runs; quoted attribute content remains literal; malformed comments fail.
+Insertion inside markup or character references is not promised invariant.
 
-- 480 pairs: 288 equivalent, 120 structurally different, 72 out of language;
-- 480/480 expected producer decisions with accepted checker replay;
-- 512/512 seeded combination/differential cases with expected decisions, accepted
-  replays, and matching producer/checker parser objects or rejection witnesses;
-- 432 unique admitted bundles containing 1,728 resources, 21,168 HTML events,
-  2,160 CSS rules, 6,048 declarations, and 2,160 resource edges;
-- certificate sizes from 147 to 612 bytes (median 584.5 bytes) in that suite;
-- 96 tiny bundles and 5,120 ordered pairs, with 18,176 candidate bijections
-  examined and zero canonicalizer/oracle disagreements;
-- all 360 targeted certificate mutations rejected and all 47 unit/boundary tests
-  passed;
-- a 16-page, 19-resource stress pair with 1,200 IDs, 1,201 classes, 1,200 CSS
-  rules, and 3,601 declarations, accepted as equivalent in a median retained
-  wall time of 0.499 s over five same-process repetitions (110,832 KiB peak RSS).
+CSS uses zero-width **prelexical** comment erasure outside strings.
+`body/**c**/.x` equals `body.x`; `body /*c*/.x` retains a descendant separator.
+This convention can join lexemes, and is not CSS-standard token preservation or
+browser equivalence. `gap` is excluded as a shorthand (W3C CSS Box Alignment
+Level 3 §8.2); `row-gap` and `column-gap` remain eligible longhands.
 
-The routine local-alpha baseline happens to score 1.0 on the 408 admitted
-metamorphic pairs. The separate coupling control is therefore essential: that
-baseline reports a false positive when two pages require incompatible class
-maps, while the global method reports `different` and the checker accepts the
-witness. The simple baseline table is diagnostic, not a claim of state-of-the-art
-comparative performance.
+Manifest strings are validated before path normalization; `./`, internal `/./`,
+duplicate slashes and trailing slashes are rejected. Safe local URL dot segments
+are a separate, explicitly normalized case. Directory traversal is sorted-name
+DFS and resource admission uses sorted relative paths, not creation order.
+HTML events (10,000), CSS rules (4,000) and declarations (8,000) are **whole-bundle**
+caps, with early per-file checks. CSS counts are incremental. The `O(S log S)`
+claim concerns only post-admission canonicalization/replay under its atom and
+symbol-table cost assumptions; it does not bound parsing or environmental work.
 
-## Language and certificate boundary
+The negative witness stores byte offset, byte-or-null values and two lengths.
+For `d=digits(max(1,m,n))`, its conservative wire bound is `400+3d < 512` under
+fixed input limits. Full exact asset base64 remains in reconstructed canonical
+objects. Regressions cover all ordered pairs of U+0085/U+2028/U+2029, strict
+prefixes, and two unequal 2-MiB assets without an oversized certificate.
 
-The complete operational definition is in
-`docs/language-and-certificates.md`. In brief, admission rejects scripts, forms,
-controls, frames, embedded objects, inline event/style attributes, external or
-query-bearing URLs, unknown/unreachable files, symlinks, malformed document
-skeletons, CSS at-rules, custom properties, shorthands, duplicate declarations,
-unsupported selectors, undeclared selector names, duplicate global IDs, and a
-class introduction that contains more than one previously unseen class in one
-unordered class list.
+## Evidence and correct experimental units
 
-The last restriction is structural, not aesthetic. It makes the first class
-introduction independent of class-token order. Removing it creates a symmetric
-choice that this lightweight canonicalizer cannot resolve without a general
-nominal-graph canonical-labeling procedure.
+* 480 owned base/variant pairs: 288 equivalent, 120 different, 72 out of language;
+  all expected decisions and replay checks pass.
+* 512 seeded combinations: 256 equivalent, 160 different, 96 out of language;
+  all decisions/replays and same-source canonical/rejection comparisons agree.
+* 96 tiny bundles, 5,120 ordered pairs, 18,176 explicit candidate bijections;
+  zero canonicalizer/oracle disagreements.
+* **72 base certificate instances**: 24 in each of three decision classes,
+  **five mutations per instance**, hence 120 attempts per class and **360 total**;
+  zero corrupted certificates accepted. This is not 360 independent originals.
+* **84 unit/boundary tests**, comprising 47 inherited tests and 37 targeted
+  regressions/read-only count checks; no failures, errors or skips.
+* Stress construction: **16 content HTML pages plus one root HTML = 17 HTML**,
+  one CSS and one asset = **19 resources**. It has 1,200 IDs, 1,201 classes,
+  1,200 rules and 3,601 declarations. Current measured median wall is
+  0.335828 s, process peak RSS 119,324 KiB; one size/environment, not a scaling curve.
 
-## Repository map
+The corrected `stress` fields distinguish `content_pages`, `root_html_pages`,
+`html_resources` and `resources`. The former `pages:16` meant content pages only.
+`combination-summary.json` uses
+`producer_checker_canonical_or_rejection_agreements`, not a parser-independence
+label. `evidence/retained-results/` holds the exact ten incoming observations,
+including their original timings and old field labels, unchanged. Field-level
+changes from those observations are recorded in `evidence/result-reconciliation.json`.
+Current results are fresh runs, not edits to historical measurements.
+The retained campaign's `certificate_bytes` field counts compact sorted-key ASCII
+JSON **without** a trailing newline. CLI wire-size receipts and the negative
+certificate size bound include that newline; the two measures differ by one byte
+for the same certificate. Asset sizes and canonical bytes are exact byte counts.
 
-- `src/producer_core.py`: admission, canonicalization, and certificate producer
-- `src/checker_core.py`: separately packaged parser and certificate replay
-- `src/exact_oracle.py`: exhaustive tiny-bundle bijection oracle
-- `src/fixture_factory.py`: owned benign bases and metamorphic variants
-- `src/baselines.py`: four deliberately simple diagnostic baselines
-- `tests/test_iwb.py`: unit, boundary, oracle, coupling, and mutation checks
-- `fixtures/`: packaged owned/variant/tiny/coupling inputs; evaluation materializes
-  deterministic combination/stress working sets at run time
-- `results/`: retained outputs, resource intake, and read-only anchor inventory
-- `literature/reference-audit.csv`: one audit row for each of the 70 cited entries
-- `literature/literature-calibration.csv`: the 12+5+5 full-text calibration set
-- `proofs/correctness.md`: definitions, theorem, proof obligations, and limits
-- `docs/language-and-certificates.md`: schemas and operational semantics
-- `baseline_trace/`: preserved narrow failure modes from the earlier formulation
-- `claim_evidence_ledger.csv`: paper/artifact claim-to-evidence map
-- `external_resources.csv`: external metadata and integration record
+## Unavailable natural-source study
 
-## External-source and safety boundary
+**No natural-source experiment is delivered or claimed.** The supplied project,
+standalone archive and FAC-labelled archive do not contain
+`natural_source_study.py`, a usable public source selection, source bytes or
+matching experiment results. The only putative selection was a 20-byte header.
+It is retained as `evidence/unavailable-study-selection.csv`, with its absence
+record. It cannot support the earlier narrative of 24 public roots, parser
+agreement or a natural-corpus result. No script or data was reconstructed from
+that narrative, and no README command calls a missing program.
 
-The motivating public repository is MIT-licensed, but no source blob from it is
-included. `results/anchor-static-inventory.json` retains only repository metadata
-and four GitHub code-search index counts. Those counts overlap and are not an
-eligibility denominator. No active page was fetched into this deliverable,
-rendered, executed, transformed, or redistributed.
+The inherited `results/anchor-static-inventory.json` contains only motivating
+repository metadata/index observations, not source admission or detection results.
+No live repository URL for this artifact is fabricated.
 
-All fixture topics are benign (libraries, museums, gardens, courses, science
-clubs, and walking trails). Assets are local one-pixel owned bytes. There are no
-credentials, real destinations, form submission paths, phishing brands, or
-automated interaction workflows.
+## Files and disclosure
 
-## Licensing, authorship, and AI disclosure
+`src/` contains the implementation, `tests/` the tests, `docs/` the operational
+contract, `proofs/` written arguments, `results/` current outputs, `evidence/`
+original observations and repair checks. `claim_evidence_ledger.csv` maps claims
+to actual code/results. `baseline_trace/` retains the earlier narrow trace
+counterexample as background, not as full web evidence.
 
-The implementation, fixtures, tests, proofs, and documentation are released
-under the MIT license in `LICENSE`. External resources are metadata-only and are
-listed in `external_resources.csv`; no third-party implementation is vendored.
-
-Substantive research formulation, proof drafting, implementation, experiments,
-and manuscript prose were generated with GPT-5.6 Sol Pro in ChatGPT. The named human
-authors must review the science, satisfy authorship and originality rules, and
-make any required disclosure before external use. A successful self-check is not
-independent review, formal verification, or evidence of acceptance.
-
-
-## Complete clean reproduction (final packet)
-
-From any working directory, with `ARTIFACT` set to this extracted repository
-root:
-
-```sh
-python "$ARTIFACT/generate_fixtures.py"
-rm -rf "$ARTIFACT/reproduced"
-python "$ARTIFACT/test.py" --out "$ARTIFACT/reproduced"
-python "$ARTIFACT/evaluate.py" --out "$ARTIFACT/reproduced"
-python "$ARTIFACT/natural_source_study.py" --out "$ARTIFACT/reproduced"
-python "$ARTIFACT/static_assurance.py" --out "$ARTIFACT/reproduced"
-python "$ARTIFACT/verify_results.py" \
-  --actual "$ARTIFACT/reproduced" --expected "$ARTIFACT/results"
-```
-
-`static_assurance.py` compiles every implementation module, confirms that the
-checker does not import the producer, and rejects network imports, dynamic
-`eval`/`exec`, and `shell=True` in the scientific implementation. These are
-static implementation checks, not a proof that the code is vulnerability-free.
+The inherited manuscript attributes earlier substantive formulation, proofs, code, experiments and prose to GPT-5.6 Sol Pro in ChatGPT; that attribution is retained as an inherited disclosure, not independently verified model metadata. The present targeted repairs, regressions, analysis and manuscript edits used GPT-6 Astra Pro. No human-only creation, author approval or independent review is asserted. The named authors must inspect the work and satisfy external-use policies.
