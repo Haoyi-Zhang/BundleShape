@@ -159,3 +159,13 @@ Historical scientific data are preserved, without extra deliverable manuscripts.
 Original code is distributed under the retained MIT license and copyright.
 Text, code and scientific records remain subject to the stated verification
 and research evidence, not a claim of human sign-off.
+
+## Manuscript diagrams
+
+The model and protocol schematics are drawn directly in Python as vector PDFs
+with embedded STIX fonts. They encode the stated relationships, not measured
+performance. To regenerate them with Python 3.9+ and Matplotlib:
+
+```sh
+python -B figures/draw_schematics.py --output figures
+```
