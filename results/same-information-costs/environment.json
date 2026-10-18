@@ -1,5 +1,5 @@
 {
-  "executable": "D:\\CodexProjects\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+  "executable": "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
   "input_sha256": {
     "fixtures/owned/fixture-00/assets/dot.png": "431ced6916a2a21a156e38701afe55bbd7f88969fbbfc56d7fe099d47f265460",
     "fixtures/owned/fixture-00/bundle.json": "e50f8f5709f8e974b34156920e8a9718f179ae4501cd6694746b4a5baffcff52",

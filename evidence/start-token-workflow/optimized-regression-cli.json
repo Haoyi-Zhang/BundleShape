@@ -1,18 +1,18 @@
 {
   "command": [
-    "D:\\CodexProjects\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+    "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
     "-O",
     "-B",
-    "D:\\CodexProjects\\wg-check\\substantive-library\\P012\\artifact\\test.py",
+    "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\test.py",
     "--suite",
     "regressions",
     "--out",
-    "D:\\CodexProjects\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-optimized-regressions"
+    "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-optimized-regressions"
   ],
   "environment": {
     "PYTHONDONTWRITEBYTECODE": "1",
     "PYTHONUTF8": "1",
-    "executable": "D:\\CodexProjects\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+    "executable": "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
     "optimized": 1,
     "platform": "Windows-11-10.0.28000-SP0",
     "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]"
