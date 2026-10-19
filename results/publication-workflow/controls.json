@@ -40,11 +40,11 @@
     "observed": "equivalent",
     "proposal": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\certify.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\anchored-multiclass-rename"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/anchored-multiclass-rename"
       ],
       "returncode": 0,
       "stderr": "",
@@ -52,12 +52,12 @@
     },
     "replay": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\check.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\anchored-multiclass-rename",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\anchored-multiclass-rename.json"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/anchored-multiclass-rename",
+        "<WORK_ROOT>/current-publication-fixtures/anchored-multiclass-rename.json"
       ],
       "returncode": 0,
       "stderr": "",
@@ -111,11 +111,11 @@
     "observed": "equivalent",
     "proposal": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\certify.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\ordinary-unquoted-attributes"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/ordinary-unquoted-attributes"
       ],
       "returncode": 0,
       "stderr": "",
@@ -123,12 +123,12 @@
     },
     "replay": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\check.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\ordinary-unquoted-attributes",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\ordinary-unquoted-attributes.json"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/ordinary-unquoted-attributes",
+        "<WORK_ROOT>/current-publication-fixtures/ordinary-unquoted-attributes.json"
       ],
       "returncode": 0,
       "stderr": "",
@@ -176,11 +176,11 @@
     "observed": "different",
     "proposal": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\certify.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\changed-publication-text"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/changed-publication-text"
       ],
       "returncode": 0,
       "stderr": "",
@@ -188,12 +188,12 @@
     },
     "replay": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\check.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\changed-publication-text",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\changed-publication-text.json"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/changed-publication-text",
+        "<WORK_ROOT>/current-publication-fixtures/changed-publication-text.json"
       ],
       "returncode": 0,
       "stderr": "",
@@ -241,11 +241,11 @@
     "observed": "different",
     "proposal": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\certify.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\changed-css-longhand"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/changed-css-longhand"
       ],
       "returncode": 0,
       "stderr": "",
@@ -253,12 +253,12 @@
     },
     "replay": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\check.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\changed-css-longhand",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\changed-css-longhand.json"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/changed-css-longhand",
+        "<WORK_ROOT>/current-publication-fixtures/changed-css-longhand.json"
       ],
       "returncode": 0,
       "stderr": "",
@@ -303,11 +303,11 @@
     "observed": "out-of-language",
     "proposal": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\certify.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\document-local-id-reuse"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/document-local-id-reuse"
       ],
       "returncode": 0,
       "stderr": "",
@@ -315,12 +315,12 @@
     },
     "replay": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\check.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\document-local-id-reuse",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\document-local-id-reuse.json"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/document-local-id-reuse",
+        "<WORK_ROOT>/current-publication-fixtures/document-local-id-reuse.json"
       ],
       "returncode": 0,
       "stderr": "",
@@ -365,11 +365,11 @@
     "observed": "out-of-language",
     "proposal": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\certify.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\simultaneously-new-classes"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/simultaneously-new-classes"
       ],
       "returncode": 0,
       "stderr": "",
@@ -377,12 +377,12 @@
     },
     "replay": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\check.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\simultaneously-new-classes",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\simultaneously-new-classes.json"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/simultaneously-new-classes",
+        "<WORK_ROOT>/current-publication-fixtures/simultaneously-new-classes.json"
       ],
       "returncode": 0,
       "stderr": "",
@@ -427,11 +427,11 @@
     "observed": "out-of-language",
     "proposal": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\certify.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\stray-start-tag-slash"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/stray-start-tag-slash"
       ],
       "returncode": 0,
       "stderr": "",
@@ -439,12 +439,12 @@
     },
     "replay": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\check.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\stray-start-tag-slash",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\stray-start-tag-slash.json"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/stray-start-tag-slash",
+        "<WORK_ROOT>/current-publication-fixtures/stray-start-tag-slash.json"
       ],
       "returncode": 0,
       "stderr": "",
@@ -489,11 +489,11 @@
     "observed": "out-of-language",
     "proposal": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\certify.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\end-tag-attribute"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/end-tag-attribute"
       ],
       "returncode": 0,
       "stderr": "",
@@ -501,12 +501,12 @@
     },
     "replay": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\check.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\end-tag-attribute",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\end-tag-attribute.json"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/end-tag-attribute",
+        "<WORK_ROOT>/current-publication-fixtures/end-tag-attribute.json"
       ],
       "returncode": 0,
       "stderr": "",
@@ -551,11 +551,11 @@
     "observed": "out-of-language",
     "proposal": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\certify.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\css-shorthand"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/css-shorthand"
       ],
       "returncode": 0,
       "stderr": "",
@@ -563,12 +563,12 @@
     },
     "replay": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\check.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\css-shorthand",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\css-shorthand.json"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/css-shorthand",
+        "<WORK_ROOT>/current-publication-fixtures/css-shorthand.json"
       ],
       "returncode": 0,
       "stderr": "",
@@ -613,11 +613,11 @@
     "observed": "out-of-language",
     "proposal": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\certify.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\css-adjacent-type-selector"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/css-adjacent-type-selector"
       ],
       "returncode": 0,
       "stderr": "",
@@ -625,12 +625,12 @@
     },
     "replay": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\check.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\css-adjacent-type-selector",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\css-adjacent-type-selector.json"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/css-adjacent-type-selector",
+        "<WORK_ROOT>/current-publication-fixtures/css-adjacent-type-selector.json"
       ],
       "returncode": 0,
       "stderr": "",
@@ -661,11 +661,11 @@
     "observed": "environment-error",
     "proposal": {
       "command": [
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\pdf-env\\Scripts\\python.exe",
+        "<PYTHON_ROOT>/Scripts/python.exe",
         "-B",
         "<PROJECTS_ROOT>\\wg-check\\substantive-library\\P012\\artifact\\certify.py",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\base",
-        "<PROJECTS_ROOT>\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\substantive_library_completion\\P012\\current-publication-fixtures\\absent-endpoint"
+        "<WORK_ROOT>/current-publication-fixtures/base",
+        "<WORK_ROOT>/current-publication-fixtures/absent-endpoint"
       ],
       "returncode": 3,
       "stderr": "environment-error: root-unavailable at .: FileNotFoundError\n",
