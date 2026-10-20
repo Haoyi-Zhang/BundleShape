@@ -87,9 +87,9 @@ class Drawing:
 def draw(out):
     d=Drawing((-1.65,-1.85,7.15,3.15))
     for i,(y,left,right) in enumerate([
-        (2.4,'Root HTML\nIDs: title, card','Relocated root HTML\nIDs: $i_0,i_1$'),
-        (1.2,'Detail HTML\nID: details','Relocated detail\nHTML, ID: $i_2$'),
-        (0,'Stylesheet\nclasses: heading, $\\ldots$','Relocated stylesheet\nclasses: $c_2$, $\\ldots$'),
+        (2.4,'Root HTML\nIDs: title, card','Relocated root HTML\nIDs: id0_0, id0_1'),
+        (1.2,'Detail HTML\nID: details','Relocated detail\nHTML, ID: id0_2'),
+        (0,'Stylesheet\nclasses: heading, $\\ldots$','Relocated stylesheet\nclasses: cl0_2, $\\ldots$'),
         (-1.2,'Image','Relocated image')]):
         d.box('l'+str(i),0,y,2.85,.85,left,size=8.5)
         d.box('r'+str(i),5.5,y,2.85,.85,right,size=8.5)
@@ -102,18 +102,24 @@ def draw(out):
         ('left',0,0,'left bundle\ncaller supplied'),
         ('right',0,-2.4,'right bundle\ncaller supplied'),
         ('admit',4,0,'strict admission\nand event extraction'),
-        ('res',8,0,'rooted resource\nlabels $r_k$'),
-        ('names',8,-2.4,'ID/class anchors\n$i_k,c_k$'),
-        ('local',4,-2.4,'exact local\ncanonical records'),
-        ('decision',4,-4.9,'$\\mathcal{N}(B)$ vs.\n$\\mathcal{N}(B\\prime)$'),
-        ('cert',8,-4.9,'producer: total maps,\nfirst mismatch, or\nfirst error')]:
-        d.box(name,x,y,3.15,1.35 if name=='cert' else 1.2,label,size=8.5)
+        ('canonical',8,0,'resource labels $r_k$\nID/class anchors $i_k,c_k$\nexact canonical records'),
+        ('decision',8,-2.4,'$\\mathcal{N}(B)$ vs.\n$\\mathcal{N}(B\\prime)$'),
+        ('cert',8,-4.9,'producer: total maps\nor first mismatch'),
+        ('error',4,-2.4,'first structural error\nadmission certificate'),
+        ('environment',0,-4.9,'environmental failure\nno certificate')]:
+        d.box(name,x,y,3.15,1.7 if name=='canonical' else 1.2,label,size=8.5)
     d.box('check',4,-7.8,4.9,1.2,'checker reparses endpoints,\nvalidates schema, and replays',size=8.5)
     d.edge('left','admit','e','w')
-    d.arrow(d.point('right','e'),d.point('admit','s'),via=[(2.2,-2.4),(2.2,-1.3),(4,-1.3)])
-    d.edge('admit','res','e','w');d.edge('res','names')
-    d.edge('names','local','w','e');d.edge('local','decision');d.edge('decision','cert','e','w')
-    d.arrow(d.point('cert','s'),d.point('check','n'),via=[(8,-6.6),(4,-6.6)])
+    d.arrow(d.point('right','e'),d.point('admit','w'),via=[(1.9,-2.4),(1.9,-.9),(2.15,-.9),(2.15,0)])
+    d.edge('admit','canonical','e','w')
+    d.text(6,-.35,'ok',size=8)
+    d.edge('canonical','decision');d.edge('decision','cert')
+    d.edge('admit','error')
+    d.text(4.95,-1.2,'structural',size=8)
+    d.arrow(d.point('admit','s'),d.point('environment','e'),via=[(4,-1.2),(2.25,-1.2),(2.25,-4.9)])
+    d.text(1.25,-3.8,'I/O failure',size=8)
+    d.edge('error','check')
+    d.arrow(d.point('cert','s'),(5.8,-7.2),via=[(8,-6.6),(5.8,-6.6)])
     d.arrow(d.point('left','w'),(4-4.9/2,-7.6),dashed=True,via=[(-2.2,0),(-2.2,-7.6)])
     d.arrow(d.point('right','w'),(4-4.9/2,-8),dashed=True,via=[(-1.8,-2.4),(-1.8,-8)])
     d.save(out,'canonical-pipeline')
