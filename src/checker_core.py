@@ -313,6 +313,20 @@ class _HTMLCollector(HTMLParser):
         raise AdmissionError("bad-start-tag", self._loc(),
                              "expected spaced attributes with quoted or nonempty unquoted values")
 
+    def parse_html_declaration(self, i: int) -> int:
+        # Do not let HTMLParser recover unknown declarations as comments.
+        # Buffer split tokens; only real comment markup and the doctype may
+        # reach the existing callbacks. Quoted/decoded data never enters here.
+        if self.rawdata.startswith("<!--", i):
+            return self.parse_comment(i)
+        if self.rawdata[i:i + 9].lower() == "<!doctype":
+            return super().parse_html_declaration(i)
+        end = self.rawdata.find(">", i + 2)
+        if end < 0:
+            return -1
+        self.unknown_decl(self.rawdata[i + 2:end])
+        return end + 1  # unknown_decl raises; no recovery to handle_comment.
+
     def handle_decl(self, decl: str) -> None:
         self._flush_text()
         if decl.strip().lower() != "doctype html" or self.seen_doctype or self.events:
@@ -377,6 +391,10 @@ class _HTMLCollector(HTMLParser):
             super().goahead(0)
             if self.rawdata.startswith("<!--"):
                 raise AdmissionError("bad-html-comment", self._loc(), "unterminated comment")
+            if self.rawdata.startswith("<!"):
+                code = ("bad-doctype" if self.rawdata[:9].lower() == "<!doctype"
+                        else "unknown-declaration")
+                raise AdmissionError(code, self._loc(), "unterminated declaration")
             if self.rawdata.startswith("</"):
                 raise AdmissionError("bad-end-tag", self._loc(), "unterminated closing tag")
             if re.match(r"<[A-Za-z]", self.rawdata):

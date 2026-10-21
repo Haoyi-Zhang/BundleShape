@@ -277,7 +277,7 @@ exercise concrete programs and finite cases:
   candidate bijections;
 - 360 mutation attempts on 72 base certificate instances (24 per decision, five each);
 - 108 current unit/boundary methods, including opening/closing lexical and
-  case-insensitive root-kind checks, plus 22 supplemental methods for relation
+  case-insensitive root-kind checks, plus 30 supplemental methods for relation
   replay, measured-result enforcement and optimization-independent scientific
   gates. These are implementation observations distinct from the quantified
   relation;

@@ -82,15 +82,22 @@ functional verification inputs, not decorative publication labels.
 | Tiny exact relation | 96 bundles, 5,120 pairs, 18,176 candidate maps; zero disagreement |
 | Altered witnesses | 72 bases, five alterations each; all 360 rejected |
 | Public unit suite | 108 methods pass, no failure/error/skip |
-| Supplemental suite | 22 methods pass normally and under optimization |
+| Supplemental suite | 30 methods pass normally and under optimization |
 | Public-interface example | 11 owned controls; two equivalent, two different, six exclusions, one environmental failure |
 | Unanchored abstract encoding | 76 graphs, 5,776 pairs, 580 equivalents, zero disagreement |
 | Same-information cost | 408 admitted pairs, three repetitions, zero decision disagreement |
 
-Source-bound Windows Python 3.12.14 receipts are in
-`evidence/start-token-workflow/`. They contain raw commands, method names,
-stdout/stderr, source identities and the unedited current unit and regression
-summaries. The root-kind controls cover uppercase/mixed-case HTML entry names
+Current source-bound Windows Python 3.12.14 receipts are in
+`evidence/declaration-admission-20261021/`: 108 public methods and 30 supplemental
+methods, the latter run normally and under optimization. They contain the actual
+commands, method names, stdout/stderr, source identities, environment and unedited
+summaries. The eight added supplemental methods cover unknown declarations in
+both cores, legitimate comments/doctypes, literal text, chunk boundaries and the
+public proposal/replay commands. CI's existing regression discovery consumes them.
+
+`evidence/start-token-workflow/` preserves the earlier 108-public/22-supplemental
+source-bound receipts byte-for-byte; its supplemental count is historical.
+The root-kind controls cover uppercase/mixed-case HTML entry names
 and retain rejection of a CSS root. Static-gate controls use inert owned source
 fixtures; scientific comparisons distinguish integers from Boolean substitutes.
 
