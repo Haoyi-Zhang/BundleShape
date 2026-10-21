@@ -1,14 +1,15 @@
 {
+  "path_representation": "Portable aliases in host-specific executable, working-directory and output-path fields; recorded execution outcomes are unchanged.",
   "argv": [
-    "C:\\Users\\Administrator\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "<PYTHON_EXECUTABLE>",
     "-B",
     "test.py",
     "--suite",
     "regressions",
     "--out",
-    "D:\\CodexProjects\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\whole_library_review_20261021\\project-reviews\\P012\\consumer-closeout\\normal-output"
+    "<OUTPUT_ROOT>/normal-output"
   ],
-  "cwd": "D:\\CodexProjects\\2026-07-13\\new-chat-4\\completion_workspace\\library_review\\private\\whole_library_review_20261021\\code-stage\\P012\\artifact",
+  "cwd": "<ARTIFACT_ROOT>",
   "elapsed_seconds": 12.655999999959022,
   "environment": "environment.json",
   "executed_methods": [

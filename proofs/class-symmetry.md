@@ -66,16 +66,16 @@ NP-completeness or an unconditional exponential lower bound. The finite encoding
 control checks the lower construction on its stated domain; the written graph
 construction supplies the general argument.
 
-The companion executable class_symmetry.py checks the lower encoding on all76
-simple graphs with zero to four vertices and all5776 pairs. A separate graph
-permutation oracle and a selector-multiset class-map oracle agree on580equivalents
-and5196nonequivalents. There are4166same-size/1610different-size pairs; maximum5
-encodedclasses. These are abstract-record checks, not production admission/native
+The companion executable class_symmetry.py checks the lower encoding on all 76
+simple graphs with zero to four vertices and all 5,776 pairs. A separate graph
+permutation oracle and a selector-multiset class-map oracle agree on 580 equivalents
+and 5,196 nonequivalents. There are 4,166 same-size and 1,610 different-size pairs,
+with at most 5 encoded classes. These are abstract-record checks, not production admission/native
 HTML/browser validation or independent mechanization/novelty certification.
 
 Closest primary: Manfred Schmidt-Schauß, Conrad Rau and David Sabel,
-Algorithms for Extended Alpha-Equivalence and Complexity, RTA2013,255–270,
-https://doi.org/10.4230/LIPIcs.RTA.2013.255 . All16pages read in this audit.
-Propositions2.4/2.9/2.12 already supply colored directedGI/rooted ordered
-identification; sections3–4 supply general nominalGI boundaries. This is a domain
+Algorithms for Extended Alpha-Equivalence and Complexity, RTA 2013, 255–270,
+https://doi.org/10.4230/LIPIcs.RTA.2013.255 .
+Propositions 2.4, 2.9 and 2.12 supply the colored directed-GI and rooted ordered
+identifications; Sections 3–4 give general nominal-GI boundaries. This is a domain
 specialization, not a new general GI algorithm or an exponential lower bound.

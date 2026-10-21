@@ -11,13 +11,17 @@ literal data and equivalent chunk-boundary behavior. Public commands issue and
 replay admission witnesses and reject positive witnesses for excluded inputs.
 The language, certificate checks and shared-core development scope are unchanged.
 
-The three `*-run.json` files retain actual commands, execution times, exit codes,
+The three `*-run.json` files retain the command structure, execution times, exit codes,
 method names and raw stdout/stderr. Each `*-summary.json` is a byte-for-byte copy
 of that command's real output, including its measured local wall time.
 `source-identity.json` binds implementation, test and driver bytes;
 `environment.json` records the actual CPython 3.12.14 Windows environment.
-Literal host staging/output paths in the raw commands are provenance, not
-directories included in this artifact; use a fresh output path when replaying.
+Only host-specific paths are represented by portable aliases:
+`<PYTHON_EXECUTABLE>` selects the recorded CPython implementation,
+`<ARTIFACT_ROOT>` is the artifact working directory, and `<OUTPUT_ROOT>` is a
+fresh output directory. These fields are not literal historical path strings;
+the recorded versions, timestamps, durations, methods, stdout/stderr, outcomes
+and input/source bindings are unchanged.
 Temporary owned fixtures are not shipped here.
 
 The existing scientific-checks CI regression discovery and the supplemental
