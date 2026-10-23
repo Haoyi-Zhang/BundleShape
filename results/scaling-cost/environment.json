@@ -1,0 +1,22 @@
+{
+  "command": [
+    "python",
+    "-B",
+    "scaling_cost.py",
+    "--out",
+    "results/scaling-cost"
+  ],
+  "optimization": 0,
+  "platform": "Windows-11-10.0.28000-SP0",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "source_sha256": {
+    "comparison_cost.py": "a56a73e36a623cf6b8e7235d7b4f8088eca7d082bb6477658ed68fcfd1d9b2c2",
+    "scaling_cost.py": "ae0b162c86f856d076bfb22f4f34eb85e8ab98c80ab031df2de3d86dc636dc25",
+    "src/checker_core.py": "369d35eae8879a1a3bbe70d75332779938a16b3ee5fcdb2ffd01acdf46dfcb5e",
+    "src/fixture_factory.py": "cb817e7b6a178acfc91dea9155fb5dc409ecdd300c25432ee7b7221a8996bdf3",
+    "src/limits.py": "a66fe94731c8bcc6d8d025d552be35664f5969a7c57c818c3440ca95680df9d6",
+    "src/output_paths.py": "bc3fa38926a7527941941be7009896ca956b453b5c77b8414a17311e6f38b3f3",
+    "src/producer_core.py": "cc9ed63dcbf20ffb9a900274df7096b1c1658638c939e1956bf0f8f2b86c808e",
+    "src/stress_factory.py": "2c7837173f5073b5ad9ee57242e8e76abd05cd946a7c718f36e715f0fb5b2994"
+  }
+}

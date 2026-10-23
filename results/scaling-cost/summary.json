@@ -1,0 +1,15 @@
+{
+  "blocks_per_page": 25,
+  "content_pages": [
+    1,
+    2,
+    4,
+    8,
+    16
+  ],
+  "decision_disagreements": 0,
+  "paired_measurements": 15,
+  "points": 5,
+  "repeats_per_point": 3,
+  "scope": "Fixed owned renamed pairs, same-process alternating order; full filesystem admission, proposal, JSON round trip and replay as applicable; excludes fixture generation, startup and preliminary correctness checks. Not natural-site coverage, independent parsing, deployment, asymptotic validation or a replacement of retained timings."
+}

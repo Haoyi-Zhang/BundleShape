@@ -1,0 +1,10 @@
+{
+  "format": "iwb-1",
+  "resources": [
+    "index.html",
+    "styles/main.css",
+    "assets/dot.png",
+    "pages/page-00.html"
+  ],
+  "root": "index.html"
+}

@@ -1,0 +1,17 @@
+{
+  "format": "iwb-1",
+  "resources": [
+    "site/pages/p07.html",
+    "site/pages/p06.html",
+    "site/pages/p05.html",
+    "site/pages/p04.html",
+    "site/pages/p03.html",
+    "site/pages/p02.html",
+    "site/pages/p01.html",
+    "site/pages/p00.html",
+    "site/media/dot.png",
+    "site/css/theme.css",
+    "site/home.html"
+  ],
+  "root": "site/home.html"
+}

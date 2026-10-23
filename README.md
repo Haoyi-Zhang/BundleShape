@@ -45,6 +45,7 @@ python -O -B test.py --suite regressions --out supplemental-optimized
 python -B publication_workflow.py --work workflow-inputs --out workflow-results
 python -B class_symmetry.py --out symmetry-results
 python -B comparison_cost.py --out cost-results
+python -B scaling_cost.py --out scaling-results
 ```
 
 The abstract symmetry enumeration and paired-cost comparison are distinct
@@ -82,10 +83,11 @@ functional verification inputs, not decorative publication labels.
 | Tiny exact relation | 96 bundles, 5,120 pairs, 18,176 candidate maps; zero disagreement |
 | Altered witnesses | 72 bases, five alterations each; all 360 rejected |
 | Public unit suite | 108 methods pass, no failure/error/skip |
-| Supplemental suite | 30 methods pass normally and under optimization |
+| Supplemental suite | 35 methods pass normally and under optimization |
 | Public-interface example | 11 owned controls; two equivalent, two different, six exclusions, one environmental failure |
 | Unanchored abstract encoding | 76 graphs, 5,776 pairs, 580 equivalents, zero disagreement |
 | Same-information cost | 408 admitted pairs, three repetitions, zero decision disagreement |
+| Fixed-size cost | Five owned sizes, three paired repetitions each, zero decision disagreement |
 
 Current source-bound Windows Python 3.12.14 receipts are in
 `evidence/declaration-admission-20261021/`: 108 public methods and 30 supplemental
@@ -115,6 +117,16 @@ the certificate method is slower on 1,223 of 1,224 paired measurements.
 Direct and certificate medians are 8.614 and 17.710 ms. The ordinary method has
 the same exact Boolean target and no correspondence-certificate product.
 These results establish additional evidence cost, not speed or detection gain.
+
+`results/scaling-cost/` separately retains five fixed owned renamed pairs with
+1, 2, 4, 8 and 16 content pages and 25 blocks per page. The root HTML, stylesheet
+and image add three resources. The driver retains exact inputs, all 15 paired
+observations, replayable certificates and source identities; its generated TeX
+table is the paper's actual consumer. Alternating-order same-process timing
+charges admission, proposal, wire JSON and replay as applicable, excluding input
+generation and startup. This adds bounded size/cost observations, not a natural
+site sample or an independent parser. Five new regression methods validate the
+driver and table; the earlier source-bound 30-method receipts remain historical.
 
 `class_symmetry.py` concerns the abstract size-parameterized language without
 A3, not a relaxation of production admission. Its graph and class-map oracles
